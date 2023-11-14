@@ -1,0 +1,8 @@
+#ifndef EMPLOYEE_MANAGEMENT_FUNCTIONS_H
+#define EMPLOYEE_MANAGEMENT_FUNCTIONS_H
+
+void signUp();
+char login();
+void adminPage();
+
+#endif //EMPLOYEE_MANAGEMENT_FUNCTIONS_H
