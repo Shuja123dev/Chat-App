@@ -1,6 +1,3 @@
-1 Shuja Shuja shuja@gmail.com Shuja123 admin
-2 Zia Zia zia@gmail.com Zia12345 ceo
-3 Ali Ali ali@gmail.com ali@1234 manager
-4 Asad Asad asad@gmail.com asad1234 employee
-5 Emp1 Emp1 emp1@gmail.com emp12345 employee
-6 Raza Raza raza@gmail.com raza1234 employee
+1 Shuja Shuja 12323434239 shuja@gmail.com Shuja123 admin
+2 Ali Ali 223344 ali@gmail.com ali12345 user
+3 Ahmed Ahmed 112233 ahmed@gmail.com ahmed123 user

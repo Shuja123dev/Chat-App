@@ -5,9 +5,9 @@ using namespace std;
 
 void App() {
     char choice;
-    cout << " ┌──────────────────────────────────────────────────────────────────────────────────────┐" << endl;
-    cout << " |\t\t\t\tWelcome To Employee Management   \t\t\t|" << endl;
-    cout << " └──────────────────────────────────────────────────────────────────────────────────────┘" << endl;
+    cout << " ┌──────────────────────────────────────────────────────────────────────────────┐" << endl;
+    cout << " |\t\t\t\tWelcome To Chat App\t\t\t\t|" << endl;
+    cout << " └──────────────────────────────────────────────────────────────────────────────┘" << endl;
     cout << "Press 'l' to Login. \n";
     cout << "Don't have account? Press 's' to create account : ";
     cin >> choice;
@@ -20,17 +20,8 @@ void App() {
         }
         case 'l': {
             char role = login();
-            if(role == 'a'){
-                adminPage();
-            }
-            else if(role=='u'){
-//                userPage();
-            }
-            else if(role=='c'){
-//                chefPage();
-            }
-            else if(role=='s'){
-//                staffPage();
+            if(role == 'u'){
+                userPage();
             }
             break;
         }

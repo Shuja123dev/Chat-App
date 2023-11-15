@@ -3,6 +3,6 @@
 
 void signUp();
 char login();
-void adminPage();
+void userPage();
 
 #endif //EMPLOYEE_MANAGEMENT_FUNCTIONS_H
