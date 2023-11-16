@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include "functions.h"
 
 using namespace std;
@@ -228,6 +229,10 @@ void addContact() {
         }
     }
 
+    if (occour == 0) {
+        cout << "Sorry! User with this contact is not Linked to Our Platform.\n";
+    }
+
     string fileName = usersInfo[activeUser][2] + "Contacts.txt";
 
     fstream ContactsFile(fileName, ios::app);
@@ -236,41 +241,76 @@ void addContact() {
 
     ContactsFile.close();
 
-    delete[] UserContacts;
+}
 
-    if (occour == 0) {
-        cout << "Sorry! User with this contact is not Linked to Our Platform.\n";
+void loadPreviousChat() {
+
+}
+
+void readChats(string fileName) {
+    fstream ChatFile(fileName, ios::in);
+    if (!ChatFile.is_open()) {
+        cout << "\nUnable to Load Chats!!!\n";
+        return;
+    }
+    string line;
+    cout << "\n";
+    while (getline(ChatFile, line)) {
+        cout << line << endl;
+    }
+    ChatFile.close();
+}
+
+void chatWithPerson(string fileName) {
+    string message;
+    int choice;
+    cout << endl;
+    while (1) {
+
+        cout << "Enter Message (-1 to Exit) : ";
+        getline(cin, message);
+        if (message == "-1") {
+            break;
+        }
+
+        fstream ChatFile(fileName, ios::app);
+        if (ChatFile.is_open()) {
+            ChatFile << usersInfo[activeUser][2] << ": " << message << endl;
+        }
+        ChatFile.close();
+
     }
 }
 
 void userPage() {
     int choice;
-    do{
+    do {
         cout << endl;
         cout << " ┌─────────────────────────────────────────────────────────────────┐" << endl;
         cout << " |\t\t\t MAIN MENU \t\t\t\t   |" << endl;
         cout << " └─────────────────────────────────────────────────────────────────┘" << endl;
         cout << "1. Add More Contacts.";
         cout << "\n2. View Contacts.";
-        cout << "\n3. Exit.";
+        cout << "\n3. Chats.";
+        cout << "\n4. Exit.";
         cout << "\nEnter your Choice : ";
         cin >> choice;
         switch (choice) {
-            case 1:{
-                while (1){
+            case 1: {
+                while (1) {
                     int iterator;
                     addContact();
-                    cout << "\nEnter 0 to Go Main Menu and 1 to add More Contacts.";
+                    cout << "\nEnter 0 to Go Main Menu and 1 to add More Contacts : ";
                     cin >> iterator;
-                    if(iterator == 0){
+                    if (iterator == 0) {
                         break;
                     }
                 }
                 break;
             }
-            case 2:{
+            case 2: {
                 int nContacts = getContacts();
-                if(nContacts !=0){
+                if (nContacts != 0) {
                     cout << "\nYour Contacts : \n";
                     for (int j = 0; j < nContacts - 1; ++j) {
                         cout << j + 1 << ". " << userContacts[j][0] << "\t" << userContacts[j][1] << endl;
@@ -278,6 +318,44 @@ void userPage() {
                 }
                 break;
             }
+            case 3: {
+                int nContacts = getContacts(), iterator, chatIndex;
+                int nUsers = getExistingUsers();
+                string availableUsers[nContacts][2];
+                string dataFileName;
+                cout << "\nYou can Chat with these People in your contact List : " << endl;
+                int n = 0;
+                for (int j = 0; j < nContacts - 1; ++j) {
+                    for (int i = 0; i < nUsers - 1; ++i) {
+                        if (userContacts[j][1] == usersInfo[i][3]) {
+                            availableUsers[n][0] = userContacts[j][0];
+                            availableUsers[n][1] = userContacts[j][1];
+                            ++n;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < n; ++i) {
+                    cout << i + 1 << ". " << userContacts[i][0] << "\t" << userContacts[i][1] << endl;
+                }
+
+                cout << "\nEnter Index to Chat with Person : ";
+                cin >> chatIndex;
+                cin.ignore(1000, '\n');
+
+                cout << "\t\t----- " << availableUsers[chatIndex - 1][0] << " -----";
+
+                if ((usersInfo[activeUser][2] == "Ali" && availableUsers[chatIndex - 1][0] == "Ahmed") ||
+                     (usersInfo[activeUser][2] == "Ahmed" && availableUsers[chatIndex - 1][0] == "Ali"))
+                    dataFileName = "Ali&AhmedChat.txt";
+                else
+                    dataFileName = "DummyChat.txt";
+                readChats(dataFileName);
+                chatWithPerson(dataFileName);
+                if (iterator == 0) {
+                    break;
+                }
+            }
         }
-    } while (choice != 3);
+    } while (choice != 4);
 }
