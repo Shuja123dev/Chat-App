@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <ctime>
 #include "functions.h"
 
 using namespace std;
@@ -169,7 +170,7 @@ char login() {
 
     string role;
     cout << " ┌─────────────────────────────────────────────────────────────────┐" << endl;
-    cout << " |\t\t\t     LOGIN HERE...  \t\t\t\t   |" << endl;
+    cout << " |\t\t\t     LOGIN HERE...  \t\t\t   |" << endl;
     cout << " └─────────────────────────────────────────────────────────────────┘" << endl;
     string userName, password;
 
@@ -274,10 +275,6 @@ void addContact() {
 
 }
 
-void loadPreviousChat() {
-
-}
-
 void readChats(string fileName) {
     fstream ChatFile(fileName, ios::in);
     if (!ChatFile.is_open()) {
@@ -286,12 +283,14 @@ void readChats(string fileName) {
     string line;
     cout << "\n";
     while (getline(ChatFile, line)) {
-        cout <<"\t=> " << line << endl;
+        cout << "\t=> " << line << endl;
     }
     ChatFile.close();
 }
 
 void chatWithPerson(string fileName) {
+    time_t now = time(0);
+    string currentTime = ctime(&now);
     string message;
     int choice;
     cout << endl;
@@ -305,7 +304,7 @@ void chatWithPerson(string fileName) {
 
         fstream ChatFile(fileName, ios::app);
         if (ChatFile.is_open()) {
-            ChatFile << usersInfo[activeUser][2] << ": " << message << endl;
+            ChatFile << usersInfo[activeUser][2] << ": " << message << "\t\t\t" << currentTime;
         }
         ChatFile.close();
 
@@ -317,12 +316,13 @@ void userPage() {
     do {
         cout << endl;
         cout << " ┌─────────────────────────────────────────────────────────────────┐" << endl;
-        cout << " |\t\t\t     MAIN MENU  \t\t\t\t   |" << endl;
+        cout << " |\t\t\t     MAIN MENU  \t\t\t   |" << endl;
         cout << " └─────────────────────────────────────────────────────────────────┘" << endl;
         cout << "\t1. Add More Contacts.";
         cout << "\n\t2. View Contacts.";
         cout << "\n\t3. Chats.";
-        cout << "\n\t4. Exit.";
+        cout << "\n\t4. Groups.";
+        cout << "\n\t5. Exit.";
         cout << "\n\tEnter your Choice : ";
         cin >> choice;
         switch (choice) {
@@ -367,7 +367,7 @@ void userPage() {
                 }
 
                 for (int i = 0; i < n; ++i) {
-                    cout <<"\t" << i + 1 << ". " << availableUsers[i][0] << "\t" << availableUsers[i][1] << endl;
+                    cout << "\t" << i + 1 << ". " << availableUsers[i][0] << "\t" << availableUsers[i][1] << endl;
                 }
 
                 cout << "\nEnter Index to Chat with Person : ";
@@ -391,6 +391,10 @@ void userPage() {
                     break;
                 }
             }
+            case 4: {
+                cout << "\n\t\t\t---Groups---" << endl;
+                cout << "\t\t<---- IN UPCOMING UPDATES ---->";
+            }
         }
-    } while (choice != 4);
+    } while (choice != 5);
 }

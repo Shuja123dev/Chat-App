@@ -1,2 +1,5 @@
-Ali: Hi Ahmed
-Ahmed: Yes brother!
+Ali: Hi there...			Fri Nov 17 16:20:37 2023
+Ali: I'm can provide you a job			Fri Nov 17 16:20:48 2023
+Ahmed: No i'm working remotely with a company			Fri Nov 17 16:21:43 2023
+Ahmed: Thanks alot			Fri Nov 17 16:21:43 2023
+Ali: That's pretty good			Fri Nov 17 16:22:24 2023
