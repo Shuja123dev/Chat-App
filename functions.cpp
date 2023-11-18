@@ -311,6 +311,19 @@ void chatWithPerson(string fileName) {
     }
 }
 
+int searchContact(string name, int n) {
+    if (n < 0) {
+        return -1;
+    } else {
+        if (name == userContacts[n][0]) {
+            return n;
+        }
+        return searchContact(name, n - 1);
+    }
+
+    return -1;
+}
+
 void userPage() {
     int choice;
     do {
@@ -321,7 +334,7 @@ void userPage() {
         cout << "\t1. Add More Contacts.";
         cout << "\n\t2. View Contacts.";
         cout << "\n\t3. Chats.";
-        cout << "\n\t4. Groups.";
+        cout << "\n\t4. Search Contact.";
         cout << "\n\t5. Exit.";
         cout << "\n\tEnter your Choice : ";
         cin >> choice;
@@ -341,7 +354,7 @@ void userPage() {
             case 2: {
                 int nContacts = getContacts();
                 if (nContacts != 0) {
-                    cout << "\nYour Contacts : \n";
+                    cout << "\n\t\t\t--- Your Contacts --- \n";
                     for (int j = 0; j < nContacts - 1; ++j) {
                         cout << "\t" << j + 1 << ". " << userContacts[j][0] << "\t" << userContacts[j][1] << endl;
                     }
@@ -370,9 +383,16 @@ void userPage() {
                     cout << "\t" << i + 1 << ". " << availableUsers[i][0] << "\t" << availableUsers[i][1] << endl;
                 }
 
-                cout << "\nEnter Index to Chat with Person : ";
-                cin >> chatIndex;
-                cin.ignore(1000, '\n');
+                cout << endl;
+                while (1) {
+                    cout << "\nEnter Index to Chat with Person : ";
+                    cin >> chatIndex;
+                    cin.ignore(1000, '\n');
+                    if (chatIndex <= n) {
+                        break;
+                    }
+                    cout << "Invalid Input Try again";
+                }
 
                 system("mkdir -p chats");
 
@@ -390,10 +410,27 @@ void userPage() {
                 if (iterator == 0) {
                     break;
                 }
+
+                break;
             }
             case 4: {
-                cout << "\n\t\t\t---Groups---" << endl;
-                cout << "\t\t<---- IN UPCOMING UPDATES ---->";
+                cout << "\n\t\t\t---SEARCH CONTACT---" << endl;
+                string contactName;
+                while (1) {
+                    int nContacts = getContacts(), result;
+                    cout << "\nType name to Search Contact ( 0 to EXIT ) : ";
+                    cin >> contactName;
+                    if (contactName == "0")
+                        break;
+                    result = searchContact(contactName, nContacts);
+                    if (result != -1) {
+                        cout << "\t" << userContacts[result][0] << "\t" << userContacts[result][1];
+                    } else {
+                        cout << "\tContact not Found With this name.";
+                    }
+                }
+
+                break;
             }
         }
     } while (choice != 5);
