@@ -324,6 +324,89 @@ int searchContact(string name, int n) {
     return -1;
 }
 
+void createGroup() {
+    int nContacts = getContacts(), chatIndex;
+    int nUsers = getExistingUsers();
+    string groupName, description;
+    string availableUsers[nContacts][2];
+    string groupMembers[nContacts + 1][2];
+    groupMembers[0][0] = usersInfo[activeUser][2];
+    groupMembers[0][1] = usersInfo[activeUser][3];
+    if (nContacts == 0) {
+        cout << "\nYou dont have any contact. First Add any Contact";
+        return;
+    }
+
+    cout << "\nEnter Group Name : ";
+    getline(cin, groupName);
+    cout << "Enter Group Description : ";
+    getline(cin, description);
+
+    int n = 0;
+    for (int j = 0; j < nContacts - 1; ++j) {
+        for (int i = 0; i < nUsers - 1; ++i) {
+            if (userContacts[j][1] == usersInfo[i][3]) {
+                availableUsers[n][0] = userContacts[j][0];
+                availableUsers[n][1] = userContacts[j][1];
+                ++n;
+            }
+        }
+    }
+
+    cout << "Your Contacts : " << endl;
+
+    for (int i = 0; i < n; ++i) {
+        cout << "\t" << i + 1 << ". " << availableUsers[i][0] << "\t" << availableUsers[i][1] << endl;
+    }
+
+    cout << endl;
+    int i = 1;
+    while (1) {
+        cout << "Enter Index to Add Person in Your Group";
+        (i > 1) ? cout << " (or -1 to Exit ) : " : cout << " : ";
+        cin >> chatIndex;
+        if (chatIndex <= n) {
+            groupMembers[i][0] = availableUsers[chatIndex - 1][0];
+            groupMembers[i][1] = availableUsers[chatIndex - 1][1];
+            i++;
+        }
+        if (chatIndex > n) {
+            cout << "\nInvalid Input Try again" << endl;
+        }
+        if (chatIndex == -1) {
+            break;
+        }
+    }
+
+    cout << "\nGroup Members : \n";
+    for (int j = 0; j < (i - 1); ++j) {
+        cout << "\t" << j + 1 << ". " << groupMembers[j][0];
+        (j == 0) ? cout << " (You) " : cout << "";
+        cout << "      " << groupMembers[j][1] << endl;
+    }
+    system("mkdir -p groups");
+    string filePath = "groups/" + groupName + "GRP.txt";
+
+    fstream GroupFile(filePath, ios::app);
+    if (GroupFile.is_open()) {
+        for (int j = 0; j < (i - 1); ++j) {
+            GroupFile << groupMembers[j][0] << " ";
+        }
+        GroupFile << endl;
+        GroupFile << "<<------ " << groupName << " ------>>" << endl;
+        GroupFile << "\t\t" << description << endl;
+    }
+
+    GroupFile.close();
+
+    fstream Groups("groups/Groups.txt", ios::app);
+    if (Groups.is_open()) {
+        Groups << groupName << "GRP.txt" << endl;
+    }
+    Groups.close();
+
+}
+
 void userPage() {
     int choice;
     do {
@@ -335,7 +418,8 @@ void userPage() {
         cout << "\n\t2. View Contacts.";
         cout << "\n\t3. Chats.";
         cout << "\n\t4. Search Contact.";
-        cout << "\n\t5. Exit.";
+        cout << "\n\t5. Groups.";
+        cout << "\n\t6. Exit.";
         cout << "\n\tEnter your Choice : ";
         cin >> choice;
         switch (choice) {
@@ -432,6 +516,14 @@ void userPage() {
 
                 break;
             }
+            case 5: {
+                int choice;
+                cout << "\n\t\t\t--- GROUPS ---" << endl;
+                cout << "\nEnter 1 to Create group : ";
+                cin >> choice;
+                cin.ignore(10000, '\n');
+                createGroup();
+            }
         }
-    } while (choice != 5);
+    } while (choice != 6);
 }
