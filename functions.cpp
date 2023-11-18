@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <ctime>
+#include <sstream>
 #include "functions.h"
 
 using namespace std;
@@ -29,6 +30,7 @@ int activeUser;
 string usersInfo[noOfUsers][noOfFields];
 string employeeInfo[noOfUsers][noOfFields];
 string userContacts[50][3];
+string groupNames[100];
 
 int getExistingUsers() {
     int i = 0;
@@ -52,6 +54,19 @@ int getExistingUsers() {
     return i;
 }
 
+int getGroupsNames() {
+    int i = 0;
+    fstream GroupsNames("groups/Groups.txt", ios::in);
+    if (!GroupsNames.is_open()) {
+        return 0;
+    }
+    while (getline(GroupsNames, groupNames[i])) {
+        i++;
+    }
+    GroupsNames.close();
+
+    return i;
+}
 //Sign Up Module
 
 void signUp() {
@@ -394,18 +409,142 @@ void createGroup() {
         }
         GroupFile << endl;
         GroupFile << "<<------ " << groupName << " ------>>" << endl;
-        GroupFile << "\t\t" << description << endl;
+        GroupFile << "Description : " << description << endl;
     }
 
     GroupFile.close();
 
     fstream Groups("groups/Groups.txt", ios::app);
     if (Groups.is_open()) {
-        Groups << groupName << "GRP.txt" << endl;
+        Groups << groupName << endl;
     }
     Groups.close();
+}
+
+bool checkGroupMembers(string grpName) {
+    string fileName = "groups/" + grpName + "GRP.txt";
+    string line;
+
+    fstream GroupFile(fileName);
+
+    if (!GroupFile.is_open()) {
+        return false;
+    }
+
+    getline(GroupFile, line);
+    GroupFile.close();
+
+    istringstream iss(line);
+
+    int nWords = 0;
+    while (iss >> line) {
+        nWords++;
+    }
+
+    fstream GroupInfo(fileName);
+
+    string grpMembers[nWords];
+    for (int i = 0; i < nWords; ++i) {
+        GroupInfo >> grpMembers[i];
+    }
+
+    GroupInfo.close();
+
+    for (int i = 0; i < nWords; ++i) {
+        if (grpMembers[i] == usersInfo[activeUser][2])
+            return true;
+    }
+
+    return false;
+}
+
+bool checkGroups() {
+    int nGroups = getGroupsNames(), n = 0;
+    string userGroups[nGroups];
+
+    for (int i = 0; i < nGroups; ++i) {
+        if (checkGroupMembers(groupNames[i])) {
+            userGroups[n] = groupNames[i];
+            n++;
+        }
+    }
+
+    if (n > 0) {
+        cout << "\nYou are Member of these Groups : " << endl;
+        for (int i = 0; i < n; ++i) {
+            cout << "\t" << i + 1 << ". " << userGroups[i] << endl;
+        }
+    } else {
+        cout << "\nYou are Not Added in any Group";
+        return false;
+    }
+
+    return true;
+}
+
+void messageInGroup(string path, string msg) {
+    time_t now = time(0);
+    string currentTime = ctime(&now);
+    fstream GroupFile(path, ios::app);
+
+    if (GroupFile.is_open()) {
+        GroupFile << "\t -> " << usersInfo[activeUser][2] << " : " << msg << "\t\t\t" << currentTime;
+    }
+
+    GroupFile.close();
+}
+
+void openGroup() {
+    int grpIndex;
+    string message;
+    cout << "\n\nEnter index of Group to Open it : ";
+    cin >> grpIndex;
+    cin.ignore(1000, '\n');
+
+    string filePath = "groups/" + groupNames[grpIndex - 1] + "GRP.txt";
+
+    fstream GroupData(filePath);
+    string line;
+    cout << "\tGroup Members : ";
+    while (getline(GroupData, line)) {
+        cout << "\t" << line << endl;
+    }
+    cout << endl;
+    int choice;
+    do {
+        cout << "\n\t1. Send Message in Group.";
+        cout << "\n\t2. Add Member to Group.";
+        cout << "\n\t3. Exit.";
+        cout << "\n\tEnter Your Choice : ";
+        cin >> choice;
+        cin.ignore(100, '\n');
+        switch (choice) {
+            case 1: {
+                do {
+                    cout << "Enter message to send ( -1 to Exit ) : ";
+                    getline(cin, message);
+                    if (message == "-1")
+                        break;
+                    messageInGroup(filePath, message);
+                } while (message != "-1");
+                break;
+            }
+            case 2: {
+                cout << "\nAdd Contact to Group.";
+                break;
+            }
+            case 3:{
+                break;
+            }
+            default: {
+                cout << "\nInvalid Input";
+                break;
+            }
+        }
+    } while (choice != 3);
 
 }
+
 
 void userPage() {
     int choice;
@@ -519,10 +658,14 @@ void userPage() {
             case 5: {
                 int choice;
                 cout << "\n\t\t\t--- GROUPS ---" << endl;
-                cout << "\nEnter 1 to Create group : ";
+                if (checkGroups())
+                    openGroup();
+                cout << "\nEnter 1 to Create group (Else exit) : ";
                 cin >> choice;
                 cin.ignore(10000, '\n');
-                createGroup();
+                if (choice == 1) {
+                    createGroup();
+                }
             }
         }
     } while (choice != 6);
