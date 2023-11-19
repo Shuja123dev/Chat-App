@@ -855,5 +855,5 @@ void userPage() {
                 }
             }
         }
-    } while (choice != 6);
+    } while (choice != 7);
 }
