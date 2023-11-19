@@ -70,7 +70,7 @@ int getGroupsNames() {
 //Sign Up Module
 
 void signUp() {
-    int type, nUsers = getExistingUsers();
+    int nUsers = getExistingUsers();
     userData userInfo;
     int lastId = stoi(usersInfo[nUsers - 2][0]);
 
