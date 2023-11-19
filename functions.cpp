@@ -70,7 +70,7 @@ int getGroupsNames() {
 //Sign Up Module
 
 void signUp() {
-    int nUsers = getExistingUsers();
+    int type, nUsers = getExistingUsers();
     userData userInfo;
     int lastId = stoi(usersInfo[nUsers - 2][0]);
 
@@ -657,10 +657,10 @@ void openGroup() {
                             cout << "\n\t <----- In Upcoming Updates ----->";
                             break;
                         }
-                        case 2:{
+                        case 2: {
                             break;
                         }
-                        default:{
+                        default: {
                             cout << "\n\tInvalid Input.";
                             break;
                         }
@@ -689,6 +689,24 @@ void openGroup() {
 }
 
 
+void deleteContact(int index, int num) {
+    for(int n = index; n < num; ++n){
+        userContacts[n][0] = userContacts[n + 1][0];
+        userContacts[n][1] = userContacts[n + 1][1];
+    }
+
+    string filePath = "contacts/" + usersInfo[activeUser][2] + "Contacts.txt";
+
+    ofstream ContactFile(filePath, ios::trunc);
+
+    if(ContactFile.is_open()){
+        for (int i = 0; i < num - 1; ++i) {
+            ContactFile << userContacts[i][0] << " "
+                        << userContacts[i][1] << endl;
+        }
+    }
+}
+
 void userPage() {
     int choice;
     do {
@@ -700,8 +718,9 @@ void userPage() {
         cout << "\n\t2. View Contacts.";
         cout << "\n\t3. Chats.";
         cout << "\n\t4. Search Contact.";
-        cout << "\n\t5. Groups.";
-        cout << "\n\t6. Exit.";
+        cout << "\n\t5. Delete Contact.";
+        cout << "\n\t6. Groups.";
+        cout << "\n\t7. Exit.";
         cout << "\n\tEnter your Choice : ";
         cin >> choice;
         switch (choice) {
@@ -799,6 +818,27 @@ void userPage() {
                 break;
             }
             case 5: {
+                cout << "\n\t\t\t ----- Delete Contact -----";
+
+                int nContacts = getContacts();
+                if (nContacts != 0) {
+                    cout << "\n\tYour Contacts :  \n";
+                    for (int j = 0; j < nContacts - 1; ++j) {
+                        cout << "\t" << j + 1 << ". " << userContacts[j][0] << "\t" << userContacts[j][1] << endl;
+                    }
+                }
+
+                int contactIndex;
+                cout << "Enter Index to Delete Contact : ";
+                cin >> contactIndex;
+                if (contactIndex < nContacts) {
+                    deleteContact(contactIndex - 1, nContacts);
+                } else {
+                    cout << "\n\tInvalid Input.";
+                }
+                break;
+            }
+            case 6: {
                 int choice;
                 while (1) {
                     cout << "\n\t\t\t--- GROUPS ---" << endl;
