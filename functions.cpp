@@ -23,7 +23,7 @@ struct contact {
     string contactNo;
 };
 
-static string roles[5] = {"manager", "employee"};
+static string groupSecurity[2] = {"Every Member can send Message", "Only Admins can send message"};
 const int noOfUsers = 200;
 const int noOfFields = 7;
 int activeUser;
@@ -322,7 +322,6 @@ void chatWithPerson(string fileName) {
             ChatFile << usersInfo[activeUser][2] << ": " << message << "\t\t\t" << currentTime;
         }
         ChatFile.close();
-
     }
 }
 
@@ -396,9 +395,16 @@ void createGroup() {
     cout << "\nGroup Members : \n";
     for (int j = 0; j < (i - 1); ++j) {
         cout << "\t" << j + 1 << ". " << groupMembers[j][0];
-        (j == 0) ? cout << " (You) " : cout << "";
+        (j == 0) ? cout << " (You) -> Group Admin" : cout << "";
         cout << "      " << groupMembers[j][1] << endl;
     }
+
+    int grpSecurity;
+    cout << "\nGroup Chat Options : ";
+    cout << "\n1. Every Member can send Message.\n2. Only Admins can send message.";
+    cout << "\nEnter Your Choice : ";
+    cin >> grpSecurity;
+
     system("mkdir -p groups");
     string filePath = "groups/" + groupName + "GRP.txt";
 
@@ -410,6 +416,7 @@ void createGroup() {
         GroupFile << endl;
         GroupFile << "<<------ " << groupName << " ------>>" << endl;
         GroupFile << "Description : " << description << endl;
+        GroupFile << "\t" << groupSecurity[grpSecurity - 1] << endl << endl;
     }
 
     GroupFile.close();
@@ -419,6 +426,8 @@ void createGroup() {
         Groups << groupName << endl;
     }
     Groups.close();
+
+    cout << "Group Created Successfully";
 }
 
 bool checkGroupMembers(string grpName) {
@@ -454,6 +463,41 @@ bool checkGroupMembers(string grpName) {
         if (grpMembers[i] == usersInfo[activeUser][2])
             return true;
     }
+
+    return false;
+}
+
+bool isAdmin(string grpName, string memberName) {
+    string fileName = "groups/" + grpName + "GRP.txt";
+    string line;
+
+    fstream GroupFile(fileName);
+
+    if (!GroupFile.is_open()) {
+        return false;
+    }
+
+    getline(GroupFile, line);
+    GroupFile.close();
+
+    istringstream iss(line);
+
+    int nWords = 0;
+    while (iss >> line) {
+        nWords++;
+    }
+
+    fstream GroupInfo(fileName);
+
+    string grpMembers[nWords];
+    for (int i = 0; i < nWords; ++i) {
+        GroupInfo >> grpMembers[i];
+    }
+
+    GroupInfo.close();
+
+    if (grpMembers[0] == memberName)
+        return true;
 
     return false;
 }
@@ -494,6 +538,60 @@ void messageInGroup(string path, string msg) {
     GroupFile.close();
 }
 
+void printGrpMembers(string grpName) {
+    string fileName = "groups/" + grpName + "GRP.txt";
+    string line;
+
+    fstream GroupFile(fileName);
+
+    if (!GroupFile.is_open()) {
+        return;
+    }
+
+    getline(GroupFile, line);
+    GroupFile.close();
+
+    istringstream iss(line);
+
+    int nMembers = 0;
+    while (iss >> line) {
+        nMembers++;
+    }
+
+    fstream GroupInfo(fileName);
+
+    string grpMembers[nMembers];
+    for (int i = 0; i < nMembers; ++i) {
+        GroupInfo >> grpMembers[i];
+    }
+
+    for (int i = 0; i < nMembers; ++i) {
+        cout << "\t" << i + 1 << ". " << grpMembers[i];
+        (grpMembers[i] == usersInfo[activeUser][2]) ? cout << " ( YOU ) " : cout << "";
+        (i == 0) ? cout << "\t\t( Admin )" : cout << "";
+        cout << endl;
+    }
+
+    GroupInfo.close();
+}
+
+bool allCanSendMsg(string path) {
+    string security;
+    fstream GroupFile(path);
+
+    if (GroupFile.is_open()) {
+        for (int i = 0; i < 4; ++i) {
+            getline(GroupFile, security);
+        }
+    }
+
+    if ("\tEvery Member can send Message" == security) {
+        return true;
+    }
+
+    return false;
+}
+
 void openGroup() {
     int grpIndex;
     string message;
@@ -513,27 +611,72 @@ void openGroup() {
     int choice;
     do {
         cout << "\n\t1. Send Message in Group.";
-        cout << "\n\t2. Add Member to Group.";
-        cout << "\n\t3. Exit.";
+        cout << "\n\t2. Open Group Settings.";
+        cout << "\n\t3. View Group Members.";
+        cout << "\n\t4. Exit.";
         cout << "\n\tEnter Your Choice : ";
         cin >> choice;
         cin.ignore(100, '\n');
         switch (choice) {
             case 1: {
-                do {
-                    cout << "Enter message to send ( -1 to Exit ) : ";
-                    getline(cin, message);
-                    if (message == "-1")
-                        break;
-                    messageInGroup(filePath, message);
-                } while (message != "-1");
+                if (allCanSendMsg(filePath)) {
+                    do {
+                        cout << "Enter message to send ( -1 to Exit ) : ";
+                        getline(cin, message);
+                        if (message == "-1")
+                            break;
+                        messageInGroup(filePath, message);
+                    } while (message != "-1");
+                } else {
+                    if (isAdmin(groupNames[grpIndex - 1], usersInfo[activeUser][2])) {
+                        do {
+                            cout << "Enter message to send ( -1 to Exit ) : ";
+                            getline(cin, message);
+                            if (message == "-1")
+                                break;
+                            messageInGroup(filePath, message);
+                        } while (message != "-1");
+                    } else {
+                        cout << "\n\t> Only Admins Can send message in this group.\n";
+                    }
+                }
                 break;
             }
             case 2: {
-                cout << "\nAdd Contact to Group.";
+                cout << "\n\t <----- SETTINGS ----->";
+                if (isAdmin(groupNames[grpIndex - 1], usersInfo[activeUser][2])) {
+                    int settingChoice;
+                    cout << "\n\n\tGroup Settings : " << endl;
+                    cout << "\t1. Add More Members." << endl;
+                    cout << "\t2. Exit." << endl;
+                    cout << "\tEnter Your Choice : ";
+                    cin >> settingChoice;
+
+                    switch (settingChoice) {
+                        case 1: {
+                            cout << "\n\t <----- In Upcoming Updates ----->";
+                            break;
+                        }
+                        case 2:{
+                            break;
+                        }
+                        default:{
+                            cout << "\n\tInvalid Input.";
+                            break;
+                        }
+                    }
+
+                } else {
+                    cout << "\n\n\t> Only admins can change group settings.\n";
+                }
                 break;
             }
-            case 3:{
+            case 3: {
+                cout << "\n\t <----- GROUP MEMBERS ----->\n\n";
+                printGrpMembers(groupNames[grpIndex - 1]);
+                break;
+            }
+            case 4: {
                 break;
             }
             default: {
@@ -541,7 +684,7 @@ void openGroup() {
                 break;
             }
         }
-    } while (choice != 3);
+    } while (choice != 4);
 
 }
 
@@ -657,14 +800,18 @@ void userPage() {
             }
             case 5: {
                 int choice;
-                cout << "\n\t\t\t--- GROUPS ---" << endl;
-                if (checkGroups())
-                    openGroup();
-                cout << "\nEnter 1 to Create group (Else exit) : ";
-                cin >> choice;
-                cin.ignore(10000, '\n');
-                if (choice == 1) {
-                    createGroup();
+                while (1) {
+                    cout << "\n\t\t\t--- GROUPS ---" << endl;
+                    if (checkGroups())
+                        openGroup();
+                    cout << "\nEnter 1 to Create group (Else exit) : ";
+                    cin >> choice;
+                    cin.ignore(10000, '\n');
+                    if (choice == 1) {
+                        createGroup();
+                    } else {
+                        break;
+                    }
                 }
             }
         }
