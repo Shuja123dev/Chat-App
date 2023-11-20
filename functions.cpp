@@ -8,7 +8,7 @@
 
 using namespace std;
 
-struct userData {
+struct UserData {
     string fullName;
     string userName;
     string phNumber;
@@ -31,6 +31,8 @@ string usersInfo[noOfUsers][noOfFields];
 string employeeInfo[noOfUsers][noOfFields];
 string userContacts[50][3];
 string groupNames[100];
+
+// data getters
 
 int getExistingUsers() {
     int i = 0;
@@ -67,11 +69,30 @@ int getGroupsNames() {
 
     return i;
 }
+
+int getContacts() {
+    int i = 0;
+    string fileName = "contacts/" + usersInfo[activeUser][2] + "Contacts.txt";
+    fstream ContactsFile(fileName, ios::in);
+    if (!ContactsFile.is_open()) {
+        cout << "\nNo Contacts Found !!!\n";
+        return 0;
+    }
+    while (!ContactsFile.eof()) {
+        ContactsFile >> userContacts[i][0]
+                     >> userContacts[i][1];
+        i++;
+    }
+    ContactsFile.close();
+
+    return i;
+}
+
 //Sign Up Module
 
 void signUp() {
     int type, nUsers = getExistingUsers();
-    userData userInfo;
+    UserData userInfo;
     int lastId = stoi(usersInfo[nUsers - 2][0]);
 
     cout << endl;
@@ -181,6 +202,8 @@ bool loginAuth(T userName, T pass) {
     return false;
 }
 
+// Login Module
+
 char login() {
 
     string role;
@@ -206,23 +229,7 @@ char login() {
     return role[0];
 }
 
-int getContacts() {
-    int i = 0;
-    string fileName = "contacts/" + usersInfo[activeUser][2] + "Contacts.txt";
-    fstream ContactsFile(fileName, ios::in);
-    if (!ContactsFile.is_open()) {
-        cout << "\nNo Contacts Found !!!\n";
-        return 0;
-    }
-    while (!ContactsFile.eof()) {
-        ContactsFile >> userContacts[i][0]
-                     >> userContacts[i][1];
-        i++;
-    }
-    ContactsFile.close();
-
-    return i;
-}
+// add contact
 
 void addContact() {
     int nUsers = getExistingUsers(), occour = 0;
@@ -290,6 +297,8 @@ void addContact() {
 
 }
 
+// chat reader
+
 void readChats(string fileName) {
     fstream ChatFile(fileName, ios::in);
     if (!ChatFile.is_open()) {
@@ -302,6 +311,8 @@ void readChats(string fileName) {
     }
     ChatFile.close();
 }
+
+// chat with contacts only
 
 void chatWithPerson(string fileName) {
     time_t now = time(0);
@@ -325,6 +336,8 @@ void chatWithPerson(string fileName) {
     }
 }
 
+//search contacts
+
 int searchContact(string name, int n) {
     if (n < 0) {
         return -1;
@@ -337,6 +350,8 @@ int searchContact(string name, int n) {
 
     return -1;
 }
+
+//create group
 
 void createGroup() {
     int nContacts = getContacts(), chatIndex;
@@ -467,6 +482,8 @@ bool checkGroupMembers(string grpName) {
     return false;
 }
 
+// Admin Authentication
+
 bool isAdmin(string grpName, string memberName) {
     string fileName = "groups/" + grpName + "GRP.txt";
     string line;
@@ -526,6 +543,8 @@ bool checkGroups() {
     return true;
 }
 
+// send message in group
+
 void messageInGroup(string path, string msg) {
     time_t now = time(0);
     string currentTime = ctime(&now);
@@ -537,6 +556,8 @@ void messageInGroup(string path, string msg) {
 
     GroupFile.close();
 }
+
+// view group members
 
 void printGrpMembers(string grpName) {
     string fileName = "groups/" + grpName + "GRP.txt";
@@ -575,6 +596,8 @@ void printGrpMembers(string grpName) {
     GroupInfo.close();
 }
 
+// Only admins can send message authentication
+
 bool allCanSendMsg(string path) {
     string security;
     fstream GroupFile(path);
@@ -591,6 +614,8 @@ bool allCanSendMsg(string path) {
 
     return false;
 }
+
+//open selected group
 
 void openGroup() {
     int grpIndex;
@@ -688,9 +713,10 @@ void openGroup() {
 
 }
 
+//delete contact
 
 void deleteContact(int index, int num) {
-    for(int n = index; n < num; ++n){
+    for (int n = index; n < num; ++n) {
         userContacts[n][0] = userContacts[n + 1][0];
         userContacts[n][1] = userContacts[n + 1][1];
     }
@@ -699,13 +725,15 @@ void deleteContact(int index, int num) {
 
     ofstream ContactFile(filePath, ios::trunc);
 
-    if(ContactFile.is_open()){
+    if (ContactFile.is_open()) {
         for (int i = 0; i < num - 1; ++i) {
             ContactFile << userContacts[i][0] << " "
                         << userContacts[i][1] << endl;
         }
     }
 }
+
+// user actions
 
 void userPage() {
     int choice;
